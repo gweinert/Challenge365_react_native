@@ -13,55 +13,61 @@ class DeleteButton extends Component {
         id: PropTypes.string.isRequired,
         resource: PropTypes.string.isRequired,
         auth: PropTypes.object.isRequired,
-        challenges: PropTypes.object.isRequired,
-        title: PropTypes.oneOf([PropTypes.string, PropTypes.node])
+        challenge: PropTypes.object.isRequired,
+        title: PropTypes.oneOf([PropTypes.string, PropTypes.node]),
+        onDelete: PropTypes.func,
+        
     }
 
     static defaultProps = {
-        title: 'Delete'
+        title: 'Delete',
+        onDelete: () => {}
     }
 
     _onPress = () => {
         const {
             auth,
-            challenges,
             dispatch,
             resource,
-            id
+            id,
+            onDelete
         } = this.props
         
         let formData = new FormData()
-        formData.append("UserID", auth.profile.id)
+        formData.append("UserID", auth.profile._id)
+        formData.append("access_token", auth.profile.token)
         
-        dispatch(removeResourceSafely({resource, id, formData}))
+        dispatch(removeResourceSafely({resource, id, formData}, onDelete))
     }
 
     render() {
-        console.log("DELETEBUTTON", this)
+
         const {
             id,
             resource,
             auth,
-            challenges,
-            title
+            challenge,
+            title,
+            parent
         } = this.props
+        let challengeItem
         let itemToDelete
 
         // resource can be either challenge or reply. 
         // only things you can delete
         if (resource == 'challenge') {
-            itemToDelete = challenges.items.find(challenge => (
-                challenge.userID == auth.profile.id && challenge._id == id )
+            itemToDelete = challenge.items.find(challenge => (
+                challenge.userID == auth.profile._id && challenge._id == id )
             )
         } else if (resource == 'reply') {
-            challenges.items.every(challenge => {
-                itemToDelete = challenge.replies.find(reply => (
-                    reply.userID == auth.profile.id && reply._id == id)
+            if(parent) {
+                challengeItem = parent
+        
+                itemToDelete = challengeItem.replies.find(reply => (
+                    reply.userID == auth.profile._id && reply._id == id )
                 )
-                if (itemToDelete != undefined) return false //leave loop early
-            })
+            }
         }
-
 
         if (itemToDelete !== undefined) {
             return (
@@ -75,11 +81,11 @@ class DeleteButton extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { auth, challenges } = state
+    const { auth, challenge } = state
 
     return {
         auth,
-        challenges
+        challenge
     }
 }
 

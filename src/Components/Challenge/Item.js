@@ -1,85 +1,106 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import PropTypes            from 'prop-types'
 import { 
     StyleSheet, 
     Text, 
-    View, 
-    TouchableHighlight } from 'react-native';
-import Upvote            from '../Upvote/Upvote'
-import DeleteButton      from '../Buttons/DeleteButton'
+    View,
+    ImageBackground,
+    TouchableHighlight,
+    TouchableOpacity
+ }    from 'react-native'
+import Upvote               from '../Upvote/Upvote'
 
 const gs        = require('../../Styles/Global')
-const styles    = require('./Style') 
+let styles    = require('./Style') 
 
 
 export default class ChallengeItem extends Component {
 
     static propTypes = {
-        item: React.PropTypes.object,
-        index: React.PropTypes.number,
-        children: React.PropTypes.node,
-        onPress: React.PropTypes.func
-        
+        item: PropTypes.object,
+        children: PropTypes.node,
+        showVotes: PropTypes.bool,
+        onPress: PropTypes.func,
+        onLongPress: PropTypes.func,
+        styles: PropTypes.object,
     }
 
     static defaultProps = {
+        styles: {},
+        showVotes: true,
     }
 
-    _onPress = () => {
-        const {
-            item,
-            index,
-            onPress
-        } = this.props
-        
-        onPress && onPress(item, index)
+    constructor(props) {
+        super(props)
+
+        this._onPress = this._onPress.bind(this)
+        this._onLongPress = this._onLongPress.bind(this)
     }
+
+    _onPress() {
+        const { item, onPress } = this.props
+        
+        onPress && onPress(item)
+    }
+
+    _onLongPress() {
+        const { item, onLongPress } = this.props
+
+        onLongPress && onLongPress(item)
+    } 
 
     render() {
         const {
             item,
-            index,
             dispatch,
-            children
+            children,
+            onPress,
+            showVotes
         }                   = this.props
         const hightlightNum = item.theme
-        const trueIndex = (parseInt(index) + 1)
+        const combStyles = {...styles, ...this.props.styles}
         
         return(
-            <View style={styles.container}>
-                
-                <View style={styles.top}>
-                    <View style={[gs.circle, gs[`highlightBg${item.theme}`]]}>
-                        <Text 
-                            style={[styles.circleText, gs.circleText]}
-                        >{trueIndex}
-                        </Text>
-                    </View>
-                    <Text style={[gs.username, , gs[`highlightColor${item.theme}`]]}>{item.username}</Text>
-                </View>
-                
-                <View>
-                    <TouchableHighlight 
-                        onPress={this._onPress} 
-                        style={styles.inner}
+            <TouchableHighlight
+                activeOpacity={onPress ? 0.8 : 1}
+                style={[combStyles.container]}
+                onPress={this._onPress}
+                onLongPress={this._onLongPress}
+                >
+                <View style={combStyles.bg}>
+                    <ImageBackground 
+                        source={{uri: item.image}} 
+                        style={combStyles.bgImage}
                     >
+                        <View style={combStyles.bgStyle} />
+                        <View style={combStyles.bgLeft} />
+                    
                         <View>
-                            <Text style={styles.title}>{item.name}</Text>
-                            <Text style={styles.text}>{item.category}</Text>
-                            <Text style={styles.text}>{item.votes.length} votes</Text>
-                            <Upvote
-                                style={gs[`highlightBorder${item.theme}`]}
-                                type={'challenge'}
-                                id={item._id}
-                            />
+                            
+                            <View style={combStyles.top}>
+                                <Text style={combStyles.title}>{item.name}</Text>
+                                <View style={combStyles.topInfo}>
+                                    <Text style={[combStyles.text]}>{item.username}</Text>
+                                    <View style={combStyles.dotSpacer} />
+                                    <Text style={[combStyles.text]}>{item.locationName}</Text>
+                                </View>
+                                <Text style={combStyles.text}>{item.category}</Text>
+                            </View>
+                            <View style={combStyles.bottom}>
+                                {showVotes ? <View style={combStyles.voteContainer}>
+                                     <Upvote
+                                        type={'challenge'}
+                                        id={item._id}
+                                    /> 
+                                    <Text style={combStyles.text}>{item.votes.length} votes</Text>
+                                </View> : null }
+                            
+                                 {children} 
+                            </View>                        
                         </View>
-                    </TouchableHighlight>
-                    <DeleteButton
-                        resource="challenge"
-                        id={item._id}
-                    />
+                    </ImageBackground>
                 </View>
-                {children}
-            </View>
+            </TouchableHighlight>
         )
     }
 }

@@ -1,16 +1,19 @@
 import React, { Component } from 'react'
-import { Modal } from 'react-native'
+import PropTypes            from 'prop-types'
+import { Modal }            from 'react-native'
 
 const {GooglePlacesAutocomplete} = require('react-native-google-places-autocomplete');
-
+const secrets = require('../../../secrets.json')
 // const homePlace = {description: 'Home', geometry: { location: { lat: 48.8152937, lng: 2.4597668 } }};
 // const workPlace = {description: 'Work', geometry: { location: { lat: 48.8496818, lng: 2.2940881 } }};
 
 export default class AutoCompleteModal extends Component {
 
     static PropTypes = {
-        visible: React.PropTypes.bool,
-        onLocationSelect: React.PropTypes.func
+        visible: PropTypes.bool,
+        onLocationSelect: PropTypes.func,
+        lat: PropTypes.string,
+        lng: PropTypes.string,
     }
 
     static DefaultProps = {
@@ -19,6 +22,13 @@ export default class AutoCompleteModal extends Component {
     }
 
     render() {
+        const {
+            visible,
+            onLocationSelect,
+            lat, 
+            lng
+        } = this.props
+
         return (
             <Modal
                 animationType={"slide"} 
@@ -26,33 +36,46 @@ export default class AutoCompleteModal extends Component {
                 visible={this.props.visible}
             >
                 <GooglePlacesAutocomplete
+                    lat={lat}
+                    lng={lng}
                     placeholder='Search'
                     minLength={2} // minimum length of text to search
-                    autoFocus={false}
+                    autoFocus={true}
                     returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
                     listViewDisplayed='auto'    // true/false/undefined
                     fetchDetails={true}
-                    renderDescription={(row) => row.description} // custom description render
+                    //renderDescription={(row) => row.description} // custom description render
                     onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
                         console.log(data);
                         console.log(details);
-                        this.props.onLocationSelect(details)
+                        onLocationSelect(details)
                     }}
                     getDefaultValue={() => {
                         return ''; // text input default value
                     }}
                     query={{
                         // available options: https://developers.google.com/places/web-service/autocomplete
-                        key: 'AIzaSyClM6A4TDmRE7499bN7kJHEzkSYlSIXJE0',
+                        key: secrets.placesAPI,
                         language: 'en',// language of the results
+                        location: `${lat},${lng}`
                         //types: '(cities)', // default: 'geocode'
                     }}
                     styles={{
-                        description: {
-                        fontWeight: 'bold',
+                        textInputContainer: {
+                            backgroundColor: 'rgba(0,0,0,0)',
+                            borderTopWidth: 0,
+                            borderBottomWidth:0,
+                            marginTop: 10,
+                        },
+                        textInput: {
+                            marginLeft: 0,
+                            marginRight: 0,
+                            height: 38,
+                            color: '#5d5d5d',
+                            fontSize: 16
                         },
                         predefinedPlacesDescription: {
-                        color: '#1faadb',
+                            color: '#000'
                         },
                     }}
 
@@ -60,11 +83,15 @@ export default class AutoCompleteModal extends Component {
                     currentLocationLabel="Current location"
                     nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
                     GoogleReverseGeocodingQuery={{
+                        //latlng:
+                        //key:
                         // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
                     }}
                     GooglePlacesSearchQuery={{
                         // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
-                        rankby: 'distance'
+                        rankby: 'distance',
+                        key: secrets.placesAPI,
+                        location: `${lat},${lng}`
                     }}
 
 

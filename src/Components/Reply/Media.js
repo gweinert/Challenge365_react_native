@@ -6,38 +6,20 @@ import { StyleSheet,
         Image }             from 'react-native';
 import Video                from 'react-native-video'
 
-const styles = require('./Styles')
+let styles = require('./Styles')
 
-// export default class Media extends Component {
-
-//     static propTypes = {
-//         file: PropTypes.string,
-//         play: PropTypes.bool
-//     }
-
-//     static defaultProps = {
-//         play: false
-//     }
-
-//     componentDidMount() {
-//         console.log("ideo cdm", this.player)
-//     }
-
-//     render() {
-        // const { file, play } = this.props
-const Media = ({file, play}) => {
+const Media = ({file, play, style}) => {
     
     const isImage = (/\.(gif|jpg|jpeg|tiff|png)$/i).test(file)
     const isVideo = (/\.(avi|AVI|wmv|WMV|flv|FLV|mpg|MPG|mp4|MP4|MOV)$/i).test(file)
     const fileExtention = file.split('.').pop();
-    
-    // const hidePlay = state.videoPathPlaying == filepath ? "hide" : ""
+
     return(
         <View style={styles.media}>
             
             {isImage ? 
                 <Image
-                    style={styles.image} 
+                    style={[styles.image, style]} 
                     source={{uri: file}} /> 
                 : null 
             }
@@ -50,7 +32,7 @@ const Media = ({file, play}) => {
                                             // Pauses playback entirely.
                     //resizeMode="cover"                      // Fill the whole screen at aspect ratio.*
                     repeat={true}                           // Repeat forever.
-                    style={styles.video}
+                    style={[styles.video, style]}
                     //playInBackground={false}                // Audio continues to play when app entering background.
                     playWhenInactive={false}                // [iOS] Video continues to play when control or notification center are shown.
                     //ignoreSilentSwitch={"ignore"}           // [iOS] ignore | obey - When 'ignore', audio will still play with the iOS hard silent switch set to silent. When 'obey', audio will toggle with the switch. When not specified, will inherit audio settings as usual.
@@ -68,6 +50,17 @@ const Media = ({file, play}) => {
             
         </View>
     )
+}
+
+Media.propTypes = {
+    file: PropTypes.string.isRequired,
+    play: PropTypes.bool,
+    style: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+}
+
+Media.defaultProps = {
+    play: false,
+    style: {},
 }
 
 export default Media

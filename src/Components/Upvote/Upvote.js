@@ -18,7 +18,12 @@ class Upvote extends Component {
         id: PropTypes.string.isRequired,
         subId: PropTypes.string,
         dispatch: PropTypes.func.isRequired,
-        auth: PropTypes.object.isRequired
+        auth: PropTypes.object.isRequired,
+        color: PropTypes.string
+    }
+
+    static defaultProps = {
+        color: '#fff'
     }
 
     _onPress = () => {
@@ -27,10 +32,8 @@ class Upvote extends Component {
             type,
             id,
             subId,
-            userID: auth.profile.id
+            userID: auth.profile._id
         }
-
-        // console.log("thison press props", this)
         
         dispatch(createUpvoteIfNotPosting(upvote))
     
@@ -39,16 +42,16 @@ class Upvote extends Component {
     
     render() {
         const {
-            style
+            color
         } = this.props
-
+        
         return (
             <TouchableOpacity 
-                style={[styles.upvote, style]}
+                style={[styles.upvote, {borderColor: color}]}
                 onPress={this._onPress}
             >
-                <Text style={styles.checkmarkStem}></Text>
-                <Text style={styles.checkmarkKick}></Text>
+                <View style={[styles.checkmarkStem, {backgroundColor: color}]}></View>
+                <View style={[styles.checkmarkKick, {backgroundColor: color}]}></View>
             </TouchableOpacity>
         )
     
@@ -72,8 +75,8 @@ styles = StyleSheet.create({
         width: 30,
         height: 30,
         borderStyle: 'solid',
-        borderRadius: 30 / 2,
-        borderColor: 'black',
+        borderRadius: 15,
+        borderColor: '#fff',
         borderWidth: 1,
         backgroundColor: 'transparent',
         position: 'relative',
@@ -81,7 +84,7 @@ styles = StyleSheet.create({
     },
     checkmarkStem: {
         position: 'absolute',
-        backgroundColor: 'black',
+        backgroundColor: '#fff',
         width: 3,
         height: 12,
         left: 13,
@@ -91,7 +94,7 @@ styles = StyleSheet.create({
         position: 'absolute',
         width: 3,
         height: 3,
-        backgroundColor: 'black',
+        backgroundColor: '#fff',
         left: 10,
         top: 17
     }

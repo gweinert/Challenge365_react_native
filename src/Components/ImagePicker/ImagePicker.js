@@ -4,7 +4,8 @@ import {
     StyleSheet, 
     Text,
     View,
-    TouchableOpacity
+    TouchableOpacity,
+    Image
 }                           from 'react-native'
 
 
@@ -13,22 +14,19 @@ const ImagePicker = require('react-native-image-picker');
 // More info on all the options is below in the README...just some common use cases shown here
 let imagePickerOptions = {
   title: 'Select Image',
-//   customButtons: [
-//     {name: 'fb', title: 'Choose Photo from Facebook'},
-//   ],
   storageOptions: {
     skipBackup: true,
     path: 'images',
     waitUntilSaved: true
   }
 };
-let style;
+let styles
 
 export default class ImagePickerComponent extends Component {
 
     static propTypes = {
         style: PropTypes.object,
-        title: PropTypes.string,
+        text: PropTypes.string,
         onPhotoSelect: PropTypes.func,
         mediaType: PropTypes.string,
         maxWidth: PropTypes.number,
@@ -37,6 +35,11 @@ export default class ImagePickerComponent extends Component {
         videoQuality: PropTypes.string,
         durationLimit: PropTypes.number,
         noData: PropTypes.bool,
+        buttonImage: PropTypes.number,
+        text: PropTypes.string,
+        containerStyles: PropTypes.object,
+        buttonImageStyles: PropTypes.oneOf(PropTypes.object, PropTypes.number),
+        textStyles: PropTypes.object
 
     }
 
@@ -50,7 +53,11 @@ export default class ImagePickerComponent extends Component {
         quality: 0.5,
         videoQuality: 'medium',
         durationLimit: 30,
-        noData: true
+        noData: true,
+        text: '',
+        containerStyles: {},
+        buttonImageStyles: {},
+        textStyles: {},
     }
     
     constructor(props) {
@@ -88,18 +95,47 @@ export default class ImagePickerComponent extends Component {
 
     render() {
 
-        // console.log("imagePicker props", this.props)
-
-        const { title } = this.props
+        const { text, 
+                buttonImage,
+                containerStyles,
+                buttonImageStyles,
+                textStyles
+        } = this.props
         
         return (
-            <View>
-                <TouchableOpacity
-                    onPress={() => this._showImagePicker()}
-                    >
-                    <Text>{title}</Text>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+                style={[styles.button, containerStyles]}
+                onPress={() => this._showImagePicker()}
+            >
+                {buttonImage ? <Image
+                        style={[styles.buttonImage, buttonImageStyles]}
+                        source={buttonImage}
+                    /> : null 
+                }
+                <Text style={[styles.text, textStyles]}>{text}</Text>
+            </TouchableOpacity>
         )
     }
 }
+
+styles = StyleSheet.create({
+    button: {
+        backgroundColor: 'transparent',
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row'
+    },
+
+    buttonImage: {
+        width: 50,
+        height: 50,
+    },
+
+    text: {
+        color: 'gray',
+        fontSize: 16
+    },
+})

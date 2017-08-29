@@ -1,4 +1,6 @@
 {
   "name": "ChallengeMe",
-  "displayName": "ChallengeMe"
+  "displayName": "ChallengeMe",
+  "ip": "https://nameless-sierra-83823.herokuapp.com",
+  // "ip": "http://192.168.0.189:3000"
 }
